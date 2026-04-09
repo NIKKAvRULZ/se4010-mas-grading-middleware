@@ -3,7 +3,7 @@
 A locally hosted Multi-Agent System (MAS) built for the **SE4010-CTSE** module. This system simulates a secure, privacy-preserving data ingestion and verification pipeline for academic grades, designed to act as middleware for a blockchain-based ledger.
 
 ## 👥 Team Members & Responsibilities
-* **Imesh** - Ledger Anchoring Agent & Merkle Root Tool (Component 1)
+* **Imeshi** - Ledger Anchoring Agent & Merkle Root Tool (Component 1)
 * **Dilki** - Governance Audit Agent & Logging Tool (Component 2)
 * **Nithika** - Data Ingestion Agent & Extraction Tool (Component 3)
 * **Susara** - Privacy Validation Agent & ZKP Masking Tool (Component 4)
