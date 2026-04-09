@@ -81,7 +81,7 @@ se4010-mas-grading-middleware/
 ```
 
 ---
-##💻 Running the System
+## 💻 Running the System
 **To execute the multi-agent pipeline and observe the workflow:**
 ```bash
 python src/graph.py
