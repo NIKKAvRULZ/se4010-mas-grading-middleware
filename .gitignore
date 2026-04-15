@@ -1,0 +1,12 @@
+# Python virtual environment
+venv/
+env/
+
+# Python cache files
+__pycache__/
+*.pyc
+
+# Local data and logs (Important for privacy simulation)
+data/outputs/*.txt
+data/outputs/*.json
+.env
