@@ -11,8 +11,15 @@ logger = logging.getLogger(__name__)
 # Add the root directory to the system path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+# ==========================================
+# IMPORT ALL TEAM AGENTS
+# ==========================================
 from src.state import GradingBatchState
-from src.agents.ingestion_agent import run_ingestion_agent
+from src.agents.ingestion_agent import run_ingestion_agent       # Nithika
+from src.agents.governance_agent import verify_grades            # Dilki
+from src.agents.privacy_agent import run_privacy_agent           # Susara
+from src.agents.ledger_agent import run_ledger_agent             # Imeshi
+
 
 # ==========================================
 # NODE 1: NITHIKA (DATA INGESTION)
@@ -22,7 +29,6 @@ def ingestion_node(state: GradingBatchState):
     file_path = state["file_path"]
     
     try:
-        # Call the live agent you just built
         agent_output = run_ingestion_agent(file_path)
         parsed_data = json.loads(agent_output).get("students", [])
         
@@ -42,46 +48,50 @@ def governance_node(state: GradingBatchState):
     if not raw_data:
         return {"errors": ["No data received from Ingestion."]}
     
-    # TODO: Dilki will replace this with her actual agent logic and file-writing tool
-    # Simulating the audit pass
-    audit_path = "data/outputs/audit_log_simulated.txt"
-    logger.info("[NODE 2] Success: Mathematical verification passed. Audit log generated.")
+    # Call Dilki's actual agent (mapping our state to her expected input)
+    audit_result = verify_grades({"data": raw_data})
     
-    return {
-        "audit_status": "PASSED",
-        "audit_log_path": audit_path
-    }
+    if audit_result.get("status") == "success":
+        logger.info("[NODE 2] Success: Audit passed and log generated.")
+        return {
+            "audit_status": "PASSED",
+            "audit_log_path": audit_result.get("log_file")
+        }
+    else:
+        logger.error("[NODE 2] Audit Failed! Anomalies detected.")
+        return {
+            "audit_status": "FAILED",
+            "errors": [f"Governance Audit Failed. Invalid records: {audit_result.get('invalid_records')}"]
+        }
 
 # ==========================================
 # NODE 3: SUSARA (PRIVACY & SECURITY)
 # ==========================================
 def privacy_node(state: GradingBatchState):
     logger.info("[NODE 3] Privacy Agent Activated. Masking PII...")
-    raw_data = state.get("raw_json", [])
     
-    # TODO: Susara will replace this with his hashlib tool
-    # Simulating the hashing of the CandidateID
-    anonymized = []
-    for record in raw_data:
-        anon_record = record.copy()
-        anon_record["CandidateID"] = "HASHED_" + record["CandidateID"][-4:] # Mock hash
-        anonymized.append(anon_record)
-        
+    # Call Susara's actual agent
+    privacy_result = run_privacy_agent(state)
+    anonymized_data = privacy_result.get("anonymized_data", [])
+    
     logger.info("[NODE 3] Success: Student identities securely masked.")
-    return {"anonymized_data": anonymized}
+    return {"anonymized_data": anonymized_data}
 
 # ==========================================
-# NODE 4: IMESH (LEDGER ANCHORING)
+# NODE 4: IMESHI (LEDGER ANCHORING)
 # ==========================================
 def ledger_node(state: GradingBatchState):
     logger.info("[NODE 4] Ledger Agent Activated. Generating cryptographic proof...")
+    anonymized_data = state.get("anonymized_data", [])
     
-    # TODO: Imesh will replace this with his Merkle Tree tool
-    # Simulating the Merkle Root generation
-    mock_merkle_root = "0x8f3a9b2e...c4d1"
+    if not anonymized_data:
+        return {"errors": ["No anonymized data received for ledger anchoring."]}
     
-    logger.info(f"[NODE 4] Success: Payload anchored. Merkle Root: {mock_merkle_root}")
-    return {"merkle_root": mock_merkle_root}
+    # Call Imeshi's actual agent
+    merkle_root = run_ledger_agent(anonymized_data)
+    
+    logger.info(f"[NODE 4] Success: Payload anchored. Merkle Root: {merkle_root}")
+    return {"merkle_root": merkle_root}
 
 
 # ==========================================
@@ -114,7 +124,7 @@ if __name__ == "__main__":
     print("🚀 STARTING SECURE GRADING PIPELINE")
     print("="*50 + "\n")
     
-    # Define the starting state (Point it to your mock excel file)
+    # Define the starting state
     initial_state = {
         "file_path": os.path.join(os.path.dirname(__file__), "..", "data", "sample_grades.xlsx"),
         "raw_json": None,
@@ -133,5 +143,10 @@ if __name__ == "__main__":
     print("="*50)
     print(f"Final Merkle Root for Blockchain: {final_state.get('merkle_root')}")
     print(f"Audit Status: {final_state.get('audit_status')}")
+    if final_state.get('audit_log_path'):
+        print(f"Audit Log Saved At: {final_state.get('audit_log_path')}")
     if final_state.get('errors'):
         print(f"Errors Encountered: {final_state.get('errors')}")
+
+    print("\n--- Copy this Mermaid code into https://mermaid.live to see your graph ---")
+    print(mas_pipeline.get_graph().draw_mermaid())
