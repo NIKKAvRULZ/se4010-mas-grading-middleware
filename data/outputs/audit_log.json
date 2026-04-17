@@ -1,0 +1,12 @@
+[
+    {
+        "student_id": "IT21000003",
+        "name": "Alice Brown",
+        "grade": 105
+    },
+    {
+        "student_id": "IT21000004",
+        "name": "Bob White",
+        "grade": -5
+    }
+]
