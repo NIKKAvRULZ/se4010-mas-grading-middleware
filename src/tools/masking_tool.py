@@ -11,15 +11,18 @@ def mask_pii(student_data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     for record in student_data:
         masked_record = record.copy()
         
-        # Hash 'student_id' if it exists in the record
-        if "student_id" in masked_record:
-            hashed_id = hashlib.sha256(str(masked_record["student_id"]).encode()).hexdigest()
-            masked_record["student_id"] = hashed_id
+        # Updated to match Nithika's Excel columns
+        if "CandidateID" in masked_record:
+            hashed_id = hashlib.sha256(str(masked_record["CandidateID"]).encode()).hexdigest()
+            masked_record["CandidateID"] = hashed_id
             
-        # Hash 'name' if it exists in the record
-        if "name" in masked_record:
-            hashed_name = hashlib.sha256(str(masked_record["name"]).encode()).hexdigest()
-            masked_record["name"] = hashed_name
+        if "First Name" in masked_record:
+            hashed_first = hashlib.sha256(str(masked_record["First Name"]).encode()).hexdigest()
+            masked_record["First Name"] = hashed_first
+            
+        if "Last Name" in masked_record:
+            hashed_last = hashlib.sha256(str(masked_record["Last Name"]).encode()).hexdigest()
+            masked_record["Last Name"] = hashed_last
             
         anonymized_data.append(masked_record)
         

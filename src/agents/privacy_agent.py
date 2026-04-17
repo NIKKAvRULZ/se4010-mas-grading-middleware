@@ -1,44 +1,40 @@
+import os
+import sys
 from langchain_ollama import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
-from src.tools.masking_tool import mask_pii
-from src.state import GradingBatch
 
-def run_privacy_agent(state: GradingBatch) -> dict:
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
+from src.tools.masking_tool import mask_pii
+
+def run_privacy_agent(state: dict) -> dict:
     """
-    LangGraph node function for the Privacy Validation Agent (Susara's Component).
-    
-    This agent takes the 'GradingBatch' state from the Governance Agent, 
-    anonymizes the PII to ensure privacy, and uses a local Ollama LLM to
-    generate a compliance summary before passing it to the Ledger Agent.
+    LangGraph node function for the Privacy Validation Agent.
     """
+    print("\n[PRIVACY AGENT] Validating and anonymizing records...")
     
-    # 1. Extract the current batch of grades from the state
-    grades_list = state.get("grades", [])
+    # 1. Aligned with the LangGraph state.py keys
+    raw_data = state.get("raw_json", [])
     
-    # 2. Apply the cryptographic masking tool to the data
-    anonymized_data = mask_pii(grades_list)
+    # 2. Apply the cryptographic masking tool
+    anonymized_data = mask_pii(raw_data)
     
-    # 3. Use ChatOllama to generate a privacy compliance report based on the action taken
+    # 3. Use ChatOllama to generate a privacy compliance report
     try:
-        # Initialize local Ollama model (llama3 or phi3 as per README)
-        llm = ChatOllama(model="phi3") # You can change this to "llama3" if installed
+        llm = ChatOllama(model="phi3", temperature=0) 
         
         prompt = ChatPromptTemplate.from_messages([
-            ("system", "You are a data privacy auditor for a university. Summarize the anonymization action in one short sentence."),
-            ("human", f"I just hashed the names and student IDs for {len(anonymized_data)} records to ensure FERPA/GDPR compliance. Provide a direct 1-sentence log entry affirming this.")
+            ("system", "You are a strict data privacy auditor. Summarize the anonymization action in exactly one short sentence."),
+            ("human", f"I successfully hashed the PII for {len(anonymized_data)} records. Provide a formal audit log entry.")
         ])
         
         chain = prompt | llm
         privacy_status_log = chain.invoke({}).content
+        print(f"[PRIVACY LOG]: {privacy_status_log}")
         
     except Exception as e:
-        # Fallback if Ollama isn't running
-        print("⚠️ Ollama connection failed. Is the model downloaded and running?")
-        privacy_status_log = f"Anonymized {len(anonymized_data)} records via local hashing (Ollama failed)."
+        print(f"⚠️ Ollama connection failed: {e}")
     
-    # 4. Return the updated state
+    # 4. Return the newly anonymized data back to the LangGraph state
     return {
-        "grades": anonymized_data,
-        "privacy_status": "Anonymized via SHA-256",
-        "logs": [f"Privacy Agent: {privacy_status_log}"]
+        "anonymized_data": anonymized_data
     }
