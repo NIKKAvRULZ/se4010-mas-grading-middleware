@@ -1,6 +1,6 @@
 langgraph
+langchain
+langchain-ollama
 pandas
 openpyxl
-langchain
-langchain-core
-langchain-ollama
+grandalf

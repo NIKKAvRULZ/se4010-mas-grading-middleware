@@ -1,0 +1,42 @@
+[
+    {
+        "CandidateID": "IT22061348",
+        "First Name": "Nithika",
+        "Last Name": "Perera",
+        "Midterm": 85,
+        "Practical": 90,
+        "Final Grade": "A+"
+    },
+    {
+        "CandidateID": "IT22111210",
+        "First Name": "Dilki",
+        "Last Name": "H",
+        "Midterm": 80,
+        "Practical": 85,
+        "Final Grade": "A"
+    },
+    {
+        "CandidateID": "IT22206282",
+        "First Name": "M.A.I.",
+        "Last Name": "Perera",
+        "Midterm": 75,
+        "Practical": 70,
+        "Final Grade": "B+"
+    },
+    {
+        "CandidateID": "IT22276346",
+        "First Name": "N.S.G.",
+        "Last Name": "Perera",
+        "Midterm": 78,
+        "Practical": 80,
+        "Final Grade": "A-"
+    },
+    {
+        "CandidateID": "IT24000000",
+        "First Name": "Sajani",
+        "Last Name": "Kolambage",
+        "Midterm": 60,
+        "Practical": 65,
+        "Final Grade": "C+"
+    }
+]

@@ -148,5 +148,20 @@ if __name__ == "__main__":
     if final_state.get('errors'):
         print(f"Errors Encountered: {final_state.get('errors')}")
 
-    print("\n--- Copy this Mermaid code into https://mermaid.live to see your graph ---")
-    print(mas_pipeline.get_graph().draw_mermaid())
+# Print the graph visually in the terminal
+    print("\n" + "="*50)
+    print("📊 LANGGRAPH PIPELINE ARCHITECTURE")
+    print("="*50)
+    mas_pipeline.get_graph().print_ascii()
+
+    # Generate and save a PNG diagram automatically
+    try:
+        diagram_path = os.path.join(os.path.dirname(__file__), "..", "data", "outputs", "mas_architecture.png")
+        png_bytes = mas_pipeline.get_graph().draw_mermaid_png()
+        
+        with open(diagram_path, "wb") as f:
+            f.write(png_bytes)
+            
+        print(f"\n✅ Pipeline diagram successfully saved as an image at: {diagram_path}")
+    except Exception as e:
+        print(f"\n⚠️ Could not generate image diagram: {e}")
